@@ -20,7 +20,7 @@ export default async function NoteDetailsPage({ params }: NoteDetailsPageProps) 
     });
   } catch (error) {
     console.error("Failed to fetch note:", error);
-    // можно сделать редирект или показать not-found
+    
   }
 
   const dehydratedState = dehydrate(queryClient);
