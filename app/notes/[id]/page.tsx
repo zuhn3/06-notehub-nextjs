@@ -6,17 +6,22 @@ import {
 import NoteDetailsClient from "./NoteDetails.client";
 import { fetchNoteById } from "@/lib/api";
 
-export default async function NoteDetailsPage({
-  params,
-}: {
+type NoteDetailsPageProps = {
   params: { id: string };
-}) {
+};
+
+export default async function NoteDetailsPage({ params }: NoteDetailsPageProps) {
   const queryClient = new QueryClient();
 
-  await queryClient.prefetchQuery({
-    queryKey: ["note", params.id],
-    queryFn: () => fetchNoteById(params.id),
-  });
+  try {
+    await queryClient.prefetchQuery({
+      queryKey: ["note", params.id],
+      queryFn: () => fetchNoteById(params.id),
+    });
+  } catch (error) {
+    console.error("Failed to fetch note:", error);
+    // можно сделать редирект или показать not-found
+  }
 
   const dehydratedState = dehydrate(queryClient);
 
