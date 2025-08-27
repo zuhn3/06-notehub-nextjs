@@ -5,12 +5,13 @@ import {
 } from "@tanstack/react-query";
 import NoteDetailsClient from "./NoteDetails.client";
 import { fetchNoteById } from "@/lib/api";
+import { notFound } from "next/navigation";
 
-type NoteDetailsPageProps = {
+export default async function NoteDetailsPage({
+  params,
+}: {
   params: { id: string };
-};
-
-export default async function NoteDetailsPage({ params }: NoteDetailsPageProps) {
+}) {
   const queryClient = new QueryClient();
 
   try {
@@ -20,7 +21,7 @@ export default async function NoteDetailsPage({ params }: NoteDetailsPageProps) 
     });
   } catch (error) {
     console.error("Failed to fetch note:", error);
-    
+    return notFound();
   }
 
   const dehydratedState = dehydrate(queryClient);
