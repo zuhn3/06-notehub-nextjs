@@ -7,7 +7,7 @@ import NoteDetailsClient from "./NoteDetails.client";
 import { fetchNoteById } from "@/lib/api";
 import { notFound } from "next/navigation";
 
-type NoteDetailsPageProps = {
+export type PageProps = {
   params: { id: string };
 };
 
