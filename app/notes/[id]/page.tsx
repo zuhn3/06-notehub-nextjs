@@ -7,11 +7,11 @@ import NoteDetailsClient from "./NoteDetails.client";
 import { fetchNoteById } from "@/lib/api";
 import { notFound } from "next/navigation";
 
-export default async function NoteDetailsPage({
-  params,
-}: {
+type NoteDetailsPageProps = {
   params: { id: string };
-}) {
+};
+
+export default async function NoteDetailsPage({ params }: NoteDetailsPageProps) {
   const queryClient = new QueryClient();
 
   try {
