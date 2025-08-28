@@ -27,7 +27,7 @@ export async function fetchNotes(
   page: number
 ): Promise<NoteSearchResponse> {
   if (!token) {
-    throw new Error("API token is missing. Set NEXT_PUBLIC_NOTEHUB_TOKEN.");
+    throw new Error("API token is missing. Set NOTEHUB_TOKEN.");
   }
 
   const response = await api.get<NoteSearchResponse>("/notes", {
