@@ -10,7 +10,7 @@ export interface NoteSearchResponse {
 const API_BASE_URL = "https://notehub-public.goit.study/api";
 
 
-const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
+const token = process.env.NOTEHUB_TOKEN;
 
 
 const api = axios.create({
