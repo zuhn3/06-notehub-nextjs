@@ -1,12 +1,25 @@
 import NotesClient from "./Notes.client";
-import { fetchNotes } from "@/lib/api";
+import { fetchNotes } from "../../lib/api";
+import { QueryClient } from "@tanstack/react-query";
+import type { NoteSearchResponse } from "../../lib/api";
 
 export default async function NotesPage() {
+  const queryClient = new QueryClient();
+  const searchQuery = "";
   const page = 1;
-  const perPage = 10;
-  const search = "";
 
-  const initialData = await fetchNotes(page, perPage, search);
+  const initialData: NoteSearchResponse = await fetchNotes(searchQuery, page);
 
-  return <NotesClient page={page} perPage={perPage} search={search} initialData={initialData} />;
+  await queryClient.prefetchQuery({
+    queryKey: ["notes", searchQuery, page],
+    queryFn: () => Promise.resolve(initialData),
+  });
+
+  return (
+    <NotesClient
+      initialData={initialData}
+      searchQuery={searchQuery}
+      currentPage={page}
+    />
+  );
 }

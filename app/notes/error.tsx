@@ -1,17 +1,13 @@
 "use client";
 
-export default function Error({
-  error,
-  reset,
-}: {
+type Props = {
   error: Error;
-  reset: () => void;
-}) {
+};
+
+export default function Error({ error }: Props) {
   return (
     <div>
-      <h2>Something went wrong!</h2>
-      <p>{error.message}</p>
-      <button onClick={() => reset()}>Try again</button>
+      <p>Could not fetch the list of notes. {error.message}</p>
     </div>
   );
 }

@@ -1,20 +1,18 @@
-import React from "react";
-import css from "./SearchBox.module.css";
+import css from "../SearchBox/SearchBox.module.css";
 
 interface SearchBoxProps {
+  onChange: (query: string) => void;
   value: string;
-  onChange: (value: string) => void;
 }
 
-export const SearchBox: React.FC<SearchBoxProps> = ({ value, onChange }) => {
+export default function SearchBox({ value, onChange }: SearchBoxProps) {
   return (
     <input
       className={css.input}
       type="text"
       placeholder="Search notes"
-      value={value}
       onChange={(e) => onChange(e.target.value)}
-      autoComplete="off"
+      value={value}
     />
   );
-};
+}

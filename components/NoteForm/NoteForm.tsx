@@ -1,115 +1,104 @@
-import React from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import css from "../NoteForm/NoteForm.module.css";
 import { Formik, Form, Field, ErrorMessage } from "formik";
+import type { FormikHelpers } from "formik";
 import * as Yup from "yup";
-import css from "./NoteForm.module.css";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createNote } from "../../lib/api";
-import { NoteTag, CreateNoteData } from "../../types/note";
+import { showErrorToast } from "../ShowErrorToast/ShowErrorToast";
+import type { NewNote } from "../../types/note";
 
 interface NoteFormProps {
   onCancel: () => void;
-  onSuccess: () => void;
 }
 
-const allowedTags: NoteTag[] = [
-  "Todo",
-  "Work",
-  "Personal",
-  "Meeting",
-  "Shopping",
-];
-
-const validationSchema = Yup.object({
-  title: Yup.string()
-    .min(3, "Мінімум 3 символи")
-    .max(50, "Максимум 50 символів")
-    .required("Обов'язкове поле"),
-  content: Yup.string().max(500, "Максимум 500 символів").notRequired(),
-  tag: Yup.mixed<NoteTag>()
-    .oneOf(allowedTags, "Недійсний тег")
-    .required("Оберіть тег"),
-});
-
-const initialValues: CreateNoteData = {
+const initialValues: NewNote = {
   title: "",
   content: "",
   tag: "Todo",
 };
 
-const NoteForm: React.FC<NoteFormProps> = ({ onCancel, onSuccess }) => {
+export default function NoteForm({ onCancel }: NoteFormProps) {
   const queryClient = useQueryClient();
 
-  const mutation = useMutation({
-    mutationFn: (data: CreateNoteData) => createNote(data),
+  const { mutate } = useMutation({
+    mutationFn: (newNote: NewNote) => createNote(newNote),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
-      onSuccess();
+      onCancel();
+    },
+    onError: () => {
+      showErrorToast("Error creating note");
     },
   });
+
+  const validationSchema = Yup.object().shape({
+    title: Yup.string()
+      .min(3, "Title must be at least 3 characters")
+      .max(50, "Title is too long")
+      .required("Title is required"),
+    content: Yup.string().max(500, "Content is too long"),
+    tag: Yup.mixed<NewNote["tag"]>()
+      .oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"], "Invalid tag")
+      .required("Tag is required"),
+  });
+
+  const handleSubmit = (values: NewNote, actions: FormikHelpers<NewNote>) => {
+    mutate(values);
+    actions.resetForm();
+  };
 
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={(values, { setSubmitting }) => {
-        mutation.mutate(values, {
-          onSettled: () => setSubmitting(false),
-        });
-      }}
+      onSubmit={handleSubmit}
     >
-      {({ isSubmitting }) => (
-        <Form className={css.form}>
-          <label htmlFor="title" className={css.label}>
-            Заголовок:
-          </label>
+      <Form className={css.form}>
+        <div className={css.formGroup}>
+          <label htmlFor="title">Title</label>
           <Field id="title" name="title" type="text" className={css.input} />
-          <ErrorMessage name="title" component="div" className={css.error} />
+          <ErrorMessage name="title">
+            {(msg) => <span className={css.error}>{msg}</span>}
+          </ErrorMessage>
+        </div>
 
-          <label htmlFor="content" className={css.label}>
-            Вміст:
-          </label>
+        <div className={css.formGroup}>
+          <label htmlFor="content">Content</label>
           <Field
+            as="textarea"
             id="content"
             name="content"
-            as="textarea"
-            rows={5}
+            rows={8}
             className={css.textarea}
           />
-          <ErrorMessage name="content" component="div" className={css.error} />
+          <ErrorMessage name="content">
+            {(msg) => <span className={css.error}>{msg}</span>}
+          </ErrorMessage>
+        </div>
 
-          <label htmlFor="tag" className={css.label}>
-            Тег:
-          </label>
+        <div className={css.formGroup}>
+          <label htmlFor="tag">Tag</label>
           <Field as="select" id="tag" name="tag" className={css.select}>
-            {allowedTags.map((tag) => (
-              <option key={tag} value={tag}>
-                {tag}
-              </option>
-            ))}
+            <option value="Todo">Todo</option>
+            <option value="Work">Work</option>
+            <option value="Personal">Personal</option>
+            <option value="Meeting">Meeting</option>
+            <option value="Shopping">Shopping</option>
           </Field>
-          <ErrorMessage name="tag" component="div" className={css.error} />
+          <ErrorMessage name="tag">
+            {(msg) => <span className={css.error}>{msg}</span>}
+          </ErrorMessage>
+        </div>
 
-          <div className={css.buttons}>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className={css.submitButton}
-            >
-              {isSubmitting ? "Створення..." : "Створити"}
-            </button>
-            <button
-              type="button"
-              onClick={onCancel}
-              disabled={isSubmitting}
-              className={css.cancelButton}
-            >
-              Відміна
-            </button>
-          </div>
-        </Form>
-      )}
+        <div className={css.actions}>
+          <button type="button" onClick={onCancel} className={css.cancelButton}>
+            Cancel
+          </button>
+          <button type="submit" className={css.submitButton}>
+            Create note
+          </button>
+        </div>
+      </Form>
     </Formik>
   );
-};
-export default NoteForm;
+}

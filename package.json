@@ -16,6 +16,8 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-paginate": "^8.3.0",
+    "react-spinners": "^0.17.0",
+    "react-toastify": "^11.0.5",
     "use-debounce": "^10.0.5",
     "yup": "^1.7.0"
   },
@@ -24,6 +26,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/react-toastify": "^4.0.2",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "typescript": "^5"

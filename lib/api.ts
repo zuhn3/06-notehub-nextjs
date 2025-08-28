@@ -1,29 +1,61 @@
 import axios from "axios";
-import type { Note, NoteResponse, CreateNoteData } from "@/types/note";
+import type { Note, NewNote } from "../types/note";
 
-const API_BASE_URL = "https://notehub-public.goit.study/api";
+export interface NoteSearchResponse {
+  notes: Note[];
+  totalPages: number;
+}
+
+axios.defaults.baseURL = "https://notehub-public.goit.study/api";
+const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
+
 
 export async function fetchNotes(
-  page: number,
-  perPage: number,
-  search: string
-): Promise<NoteResponse> {
-  const { data } = await axios.get(`${API_BASE_URL}/notes`, {
-    params: { page, perPage, search },
+  searchQuery: string,
+  page: number
+): Promise<NoteSearchResponse> {
+  const response = await axios.get<NoteSearchResponse>(`/notes`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    params: {
+      ...(searchQuery && { search: searchQuery }),
+      perPage: 12,
+      page,
+    },
   });
-  return data;
+
+  return {
+    ...response.data,
+  };
 }
 
-export async function fetchNoteById(id: string): Promise<Note> {
-  const { data } = await axios.get(`${API_BASE_URL}/notes/${id}`);
-  return data;
+
+export async function createNote(noteData: NewNote): Promise<Note> {
+  const response = await axios.post<Note>(`/notes`, noteData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
 }
 
-export async function createNote(note: CreateNoteData): Promise<Note> {
-  const { data } = await axios.post(`${API_BASE_URL}/notes`, note);
-  return data;
+
+export async function deleteNote(id: string): Promise<Note> {
+  const response = await axios.delete<Note>(`/notes/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
 }
 
-export async function deleteNote(id: string): Promise<void> {
-  await axios.delete(`${API_BASE_URL}/notes/${id}`);
+export async function fetchNoteById(id: string) {
+  const response = await axios.get<Note>(`/notes/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
 }
