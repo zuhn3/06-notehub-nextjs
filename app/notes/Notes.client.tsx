@@ -1,3 +1,4 @@
+
 "use client";
 
 import css from "./Notes.client.module.css";
@@ -14,22 +15,12 @@ import Pagination from "../../components/Pagination/Pagination";
 import SearchBox from "../../components/SearchBox/SearchBox";
 import Modal from "../../components/Modal/Modal";
 import NoteForm from "../../components/NoteForm/NoteForm";
-import type { NoteSearchResponse } from "../../lib/api";
 
-type NoteClientProps = {
-  initialData: NoteSearchResponse;
-  searchQuery: string;
-  currentPage: number;
-};
-
-export default function NotesClient({
-  initialData,
-  searchQuery: initialSearch,
-  currentPage: initialPage,
-}: NoteClientProps) {
-  const [searchQuery, setSearchQuery] = useState(initialSearch);
-  const [currentPage, setCurrentPage] = useState(initialPage);
-  const [inputValue, setInputValue] = useState(initialSearch);
+export default function NotesClient() {
+  
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [inputValue, setInputValue] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
 
   const updateSearchQuery = useDebouncedCallback(
@@ -46,7 +37,7 @@ export default function NotesClient({
     queryKey: ["notes", searchQuery, currentPage],
     queryFn: () => fetchNotes(searchQuery, currentPage),
     placeholderData: keepPreviousData,
-    initialData: initialData,
+   
   });
 
   const totalPages = data?.totalPages || 0;

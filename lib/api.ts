@@ -10,7 +10,7 @@ export interface NoteSearchResponse {
 const API_BASE_URL = "https://notehub-public.goit.study/api";
 
 
-const token = process.env.NOTEHUB_TOKEN;
+const token = process.env.NEXT_PUBLIC_NOTEHUB_TOKEN;
 
 
 const api = axios.create({
@@ -27,7 +27,7 @@ export async function fetchNotes(
   page: number
 ): Promise<NoteSearchResponse> {
   if (!token) {
-    throw new Error("API token is missing. Set NOTEHUB_TOKEN.");
+    throw new Error("API token is missing. Set NEXT_PUBLIC_NOTEHUB_TOKEN.");
   }
 
   const response = await api.get<NoteSearchResponse>("/notes", {
