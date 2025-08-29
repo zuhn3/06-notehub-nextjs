@@ -1,45 +1,28 @@
 "use client";
 
-import { HydrationBoundary, useQuery } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
-import css from "./NoteDetails.module.css";
+import { useQuery } from "@tanstack/react-query";
 import { fetchNoteById } from "@/lib/api";
-import type { DehydratedState } from "@tanstack/react-query";
+import type { Note } from "@/types/note";
 
-function NoteDetailsPage({ id }: { id: string }) {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["note", id],
-    queryFn: () => fetchNoteById(id),
-    refetchOnMount: false,
-  });
-
-  if (isLoading) return <p>Loading, please wait...</p>;
-  if (isError || !data) return <p>Something went wrong.</p>;
-  return (
-    <div className={css.container}>
-      <div className={css.item}>
-        <div className={css.header}>
-          <h2>{data.title}</h2>
-        </div>
-        <p className={css.content}>{data.content}</p>
-        <p className={css.date}>{new Date(data.createdAt).toLocaleString()}</p>
-      </div>
-    </div>
-  );
+interface Props {
+  id: string;
 }
 
-type NoteClientProps = {
-  dehydratedState: DehydratedState;
-};
+export default function NoteDetailsClient({ id }: Props) {
+  const { data: note, isLoading, isError } = useQuery<Note>({
+    queryKey: ["note", id],
+    queryFn: () => fetchNoteById(id),
+  });
 
-export default function NoteDetailsClient({
-  dehydratedState,
-}: NoteClientProps) {
-  const params = useParams();
-  const noteId = params?.id as string;
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error loading note.</p>;
+  if (!note) return <p>No note found.</p>;
+
   return (
-    <HydrationBoundary state={dehydratedState}>
-      <NoteDetailsPage id={noteId}></NoteDetailsPage>
-    </HydrationBoundary>
+    <article>
+      <h1>{note.title}</h1>
+      <p>{note.content}</p>
+      <p><strong>Tag:</strong> {note.tag}</p>
+    </article>
   );
 }
