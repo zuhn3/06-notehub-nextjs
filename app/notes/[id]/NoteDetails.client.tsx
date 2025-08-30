@@ -12,6 +12,7 @@ export default function NoteDetailsClient({ id }: Props) {
   const { data: note, isLoading, isError } = useQuery<Note>({
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
+    refetchOnMount: false, 
   });
 
   if (isLoading) return <p>Loading...</p>;
@@ -22,7 +23,9 @@ export default function NoteDetailsClient({ id }: Props) {
     <article>
       <h1>{note.title}</h1>
       <p>{note.content}</p>
-      <p><strong>Tag:</strong> {note.tag}</p>
+      <p>
+        <strong>Tag:</strong> {note.tag}
+      </p>
     </article>
   );
 }
